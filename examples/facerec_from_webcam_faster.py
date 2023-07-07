@@ -1,6 +1,18 @@
 import face_recognition
 import cv2
 import numpy as np
+import os
+
+#Get Local FilePath
+path = os.getcwd()+'\examples'
+person_name_path = 'C:\\Users\\dguti\\OneDrive - Royal Caribbean Group\\Repos\\d-id_streams\\name.txt'
+
+import os
+obama = os.path.join(path, 'obama.jpg')
+biden = os.path.join(path, 'biden.jpg')
+daniel = os.path.join(path,'daniel_gutierrez.jpg')
+
+print(obama, biden)
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
@@ -15,21 +27,27 @@ import numpy as np
 video_capture = cv2.VideoCapture(0)
 
 # Load a sample picture and learn how to recognize it.
-obama_image = face_recognition.load_image_file("obama.jpg")
+obama_image = face_recognition.load_image_file(obama)
 obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
 
 # Load a second sample picture and learn how to recognize it.
-biden_image = face_recognition.load_image_file("biden.jpg")
+biden_image = face_recognition.load_image_file(biden)
 biden_face_encoding = face_recognition.face_encodings(biden_image)[0]
+
+# Load a second sample picture and learn how to recognize it.
+daniel_image = face_recognition.load_image_file(daniel)
+daniel_face_encoding = face_recognition.face_encodings(daniel_image)[0]
 
 # Create arrays of known face encodings and their names
 known_face_encodings = [
     obama_face_encoding,
-    biden_face_encoding
+    biden_face_encoding,
+    daniel_face_encoding
 ]
 known_face_names = [
     "Barack Obama",
-    "Joe Biden"
+    "Joe Biden",
+    "Daniel Gutierrez"
 ]
 
 # Initialize some variables
@@ -48,7 +66,8 @@ while True:
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-        rgb_small_frame = small_frame[:, :, ::-1]
+        # Convert the image from BGR color (which OpenCV uses) to RGB color
+        rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
         
         # Find all the faces and face encodings in the current frame of video
         face_locations = face_recognition.face_locations(rgb_small_frame)
@@ -72,6 +91,12 @@ while True:
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
+
+            latest_value = face_names[-1]
+            # Open a file in write mode
+            with open(person_name_path, "w") as file:
+                # Write each item to a new line in the file
+                file.write(str(latest_value))
 
     process_this_frame = not process_this_frame
 
